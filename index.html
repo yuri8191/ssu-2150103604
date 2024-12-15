@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		#image-preview {
+			width: 100%;
+			height: auto;
+		}
+	</style>
+</head>
+
+<body>
+	<input type="file" id="image-upload" accept="image/*">
+	<img id="image-preview" src="#" style="display:none;">
+	<p id="classification-result"></p>
+
+	<script>
+
+		const image_upload = document.getElementById('image-upload');
+		const image_preview = document.getElementById('image-preview');
+		image_upload.addEventListener('change', async (event) => {
+			const file = event.target.files[0];
+
+			const reader = new FileReader();
+			reader.onload = async (e) => {
+				image_preview.src = e.target.result;
+				image_preview.style.display = 'block';
+			}
+			reader.readAsDataURL(file);
+		});
+
+	</script>
+
+</body>
+
+</html>
