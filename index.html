@@ -3,6 +3,8 @@
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@latest"> </script>
 	<style>
 		#image-preview {
 			width: 100%;
@@ -18,17 +20,29 @@
 
 	<script>
 
-		const image_upload = document.getElementById('image-upload');
-		const image_preview = document.getElementById('image-preview');
-		image_upload.addEventListener('change', async (event) => {
-			const file = event.target.files[0];
+		mobilenet.load({
+			version: 2,
+			alpha: 1.0
+		}).then(model => {
+			console.log("loaded model", { model: model })
 
-			const reader = new FileReader();
-			reader.onload = async (e) => {
-				image_preview.src = e.target.result;
-				image_preview.style.display = 'block';
-			}
-			reader.readAsDataURL(file);
+			const image_upload = document.getElementById('image-upload');
+			const image_preview = document.getElementById('image-preview');
+			image_upload.addEventListener('change', async (event) => {
+				const file = event.target.files[0];
+
+				const reader = new FileReader();
+				reader.onload = async (e) => {
+					image_preview.src = e.target.result;
+					image_preview.style.display = 'block';
+				}
+				reader.readAsDataURL(file);
+
+				image_preview.onload = async () => {
+					const predictions = await model.classify(image_preview);
+					console.log("predictions", { predictions: predictions })
+				}
+			});
 		});
 
 	</script>
