@@ -14,34 +14,51 @@
 </head>
 
 <body>
-	<input type="file" id="image-upload" accept="image/*">
-	<img id="image-preview" src="#" style="display:none;">
-	<p id="classification-result"></p>
-
 	<script>
 
 		mobilenet.load({
 			version: 2,
 			alpha: 1.0
 		}).then(model => {
-			console.log("loaded model", { model: model })
+			console.log("loaded model", { model: model });
 
-			const image_upload = document.getElementById('image-upload');
-			const image_preview = document.getElementById('image-preview');
+			const image_upload = document.createElement("input");
+			image_upload.type = "file";
+			image_upload.accept = "image/*";
+
+			const container = document.createElement('div');
+			container.appendChild(image_upload);
+
+			document.documentElement.appendChild(container);
+
 			image_upload.addEventListener('change', async (event) => {
 				const file = event.target.files[0];
+
+				const image_preview = document.createElement("img");
+				image_preview.id = 'image-preview';
 
 				const reader = new FileReader();
 				reader.onload = async (e) => {
 					image_preview.src = e.target.result;
 					image_preview.style.display = 'block';
-				}
-				reader.readAsDataURL(file);
+
+					container.appendChild(image_preview);
+				};
 
 				image_preview.onload = async () => {
 					const predictions = await model.classify(image_preview);
-					console.log("predictions", { predictions: predictions })
-				}
+					console.log("predictions", { predictions: predictions });
+
+					const predictions_div = document.createElement("pre");
+					predictions_div.innerText = JSON.stringify(predictions, null, 4);
+
+					container.appendChild(predictions_div);
+					container.appendChild(image_upload);
+				};
+
+				reader.readAsDataURL(file);
+
+
 			});
 		});
 
